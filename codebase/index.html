@@ -3,114 +3,103 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>VLearn Ôn tập nhanh</title>
-    <link rel="stylesheet" href="styles.css" />
+    <title>AI Tutor Bot — VLearn</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: { brand: '#2563eb' }
+          }
+        }
+      };
+    </script>
   </head>
-  <body>
-    <main class="app-shell">
-      <header class="topbar">
-        <div class="brand-mark">V</div>
-        <div>
-          <p class="eyebrow">VLEARN · BÀI HỌC AI THỰC CHIẾN</p>
-          <h1>Ôn tập nhanh</h1>
+  <body class="h-screen overflow-hidden bg-gray-100 text-slate-800 antialiased">
+    <div id="toast" class="pointer-events-none fixed left-1/2 top-5 z-50 hidden -translate-x-1/2 rounded-xl bg-slate-900 px-4 py-3 text-sm font-medium text-white shadow-xl transition-opacity"></div>
+    <main id="app-shell" class="flex h-screen w-full flex-col md:flex-row" style="--chat-width: 40%">
+      <section class="flex min-w-0 flex-1 flex-col bg-gray-100 p-4 transition-all duration-300 sm:p-6 md:h-full">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-xs font-semibold uppercase tracking-[0.18em] text-blue-600">VLearn</p>
+            <h1 class="mt-1 text-lg font-bold text-slate-900">Khu vực tài liệu</h1>
+          </div>
+          <label class="inline-flex cursor-pointer items-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-700 focus-within:ring-4 focus-within:ring-blue-100">
+            <svg aria-hidden="true" class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1M8 12l4-4m0 0l4 4m-4-4v12" /></svg>
+            Upload Slide/PDF
+            <input id="file-input" class="sr-only" type="file" accept=".pdf,.txt,.md,.png,.jpg,.jpeg" multiple />
+          </label>
         </div>
-        <span class="mock-badge">Prototype · AI thật</span>
-      </header>
-
-      <section id="screen-material" class="screen active" aria-labelledby="material-title">
-        <div class="breadcrumb">Khoá học / Day 1 / Foundation</div>
-        <div class="hero-grid">
-          <article class="card lesson-card">
-            <div class="lesson-label"><span class="dot"></span> ĐOẠN ĐANG HỌC</div>
-            <h2 id="material-title">Attention trong Transformer</h2>
-            <p class="muted">Bài học 04 · khoảng 8 phút đọc</p>
-            <div class="source-text">
-              <p>Self-attention cho phép mô hình xác định mức độ liên quan giữa các token trong cùng một câu. Mỗi token tạo ra ba vector: Query, Key và Value.</p>
-              <p>Thông qua các vector này, mô hình quyết định nên tập trung vào những token nào khi tạo biểu diễn cho token hiện tại.</p>
+        <div class="mt-5 flex min-h-0 flex-1 gap-4">
+          <aside id="documents-sidebar" class="flex w-52 shrink-0 min-h-0 flex-col rounded-2xl border border-slate-200 bg-white p-3 shadow-sm transition-all duration-300">
+            <div class="mb-2 flex items-center justify-between gap-2 px-1">
+              <div id="file-sidebar-content" class="flex min-w-0 items-center justify-between gap-2 flex-1">
+                <p class="text-xs font-bold uppercase tracking-wider text-slate-500">Tài liệu</p>
+                <span id="file-count" class="text-[11px] text-slate-400">0 file</span>
+              </div>
+              <button id="toggle-files" class="grid h-7 w-7 shrink-0 place-items-center rounded-md text-slate-500 transition hover:bg-blue-50 hover:text-blue-600" type="button" aria-label="Thu gọn danh sách tài liệu">‹</button>
             </div>
-            <div class="citation"><span>▣</span> Nguồn: Transcript bài giảng · [T04-032] – [T04-034]</div>
-          </article>
-
-          <aside class="card action-card">
-            <div class="sparkle">✦</div>
-            <h2>Kiểm tra mức độ hiểu bài</h2>
-            <p>Trả lời 3 câu hỏi ngắn về đoạn vừa học, xem giải thích và nguồn tham khảo sau mỗi câu.</p>
-            <button id="start-quiz" class="primary-button">Tạo câu hỏi ôn tập <span>→</span></button>
-            <p id="ai-status" class="tiny-note">AI sẽ tạo câu hỏi từ nội dung tài liệu mẫu khi bạn bắt đầu.</p>
+            <div id="file-sidebar-body" class="flex min-h-0 flex-1 flex-col">
+              <div id="file-list" class="hidden min-h-0 flex-1 space-y-2 overflow-y-auto pr-1"></div>
+              <p id="file-list-empty" class="mt-2 text-center text-xs leading-5 text-slate-400">Các slide đã upload sẽ xuất hiện ở đây.</p>
+            </div>
           </aside>
-        </div>
-      </section>
 
-      <section id="screen-setup" class="screen" aria-labelledby="setup-title">
-        <div class="narrow-wrap">
-          <button class="back-button" data-target="material">← Quay lại bài học</button>
-          <div class="card setup-card">
-            <div class="step-pill">BƯỚC 1 / 2</div>
-            <h2 id="setup-title">Sẵn sàng ôn tập?</h2>
-            <p class="muted">Bạn sẽ làm một bài kiểm tra nhanh dựa trên đoạn “Attention trong Transformer”.</p>
-            <div class="setup-summary">
-              <div><strong>3</strong><span>câu hỏi</span></div>
-              <div><strong>~2</strong><span>phút</span></div>
-              <div><strong>1</strong><span>đoạn tài liệu</span></div>
+          <div class="flex min-w-0 flex-1 items-center justify-center py-1 md:py-3">
+          <div class="aspect-[16/10] w-full max-w-4xl rounded-2xl bg-white p-3 shadow-xl ring-1 ring-slate-200 transition-all duration-300 sm:p-6 md:p-8">
+            <div id="slide-preview" class="relative flex h-full flex-col justify-between overflow-hidden rounded-xl border border-dashed border-blue-200 bg-blue-50/50 p-5 sm:p-8">
+              <div class="flex items-center justify-between text-xs font-semibold uppercase tracking-wider text-blue-500">
+                <span id="document-label">Slide preview</span>
+                <span>01 / 01</span>
+              </div>
+              <div class="text-center">
+                <div class="mx-auto mb-4 grid h-14 w-14 place-items-center rounded-2xl bg-blue-100 text-blue-600">
+                  <svg aria-hidden="true" class="h-7 w-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M4 5.5A2.5 2.5 0 016.5 3h11A2.5 2.5 0 0120 5.5v13a2.5 2.5 0 01-2.5 2.5h-11A2.5 2.5 0 014 18.5v-13zM8 8h8M8 12h5" /></svg>
+                </div>
+                <p class="text-xl font-semibold text-slate-700 sm:text-2xl">Nội dung slide sẽ hiển thị tại đây</p>
+                <p id="file-name" class="mt-2 text-sm text-slate-400">Upload tài liệu để bắt đầu học</p>
+              </div>
+              <div class="h-1.5 w-1/3 rounded-full bg-blue-200"></div>
             </div>
-            <label class="request-label" for="labcoach-request">Yêu cầu kiểm thử <span>(Labcoach có thể nhập câu lạ)</span></label>
-            <textarea id="labcoach-request" class="request-input" rows="3">Tạo 3 câu hỏi trắc nghiệm ôn tập từ tài liệu này.</textarea>
-            <p id="setup-ai-status" class="tiny-note"></p>
-            <button id="begin-quiz" class="primary-button full-width">Bắt đầu làm bài <span>→</span></button>
           </div>
         </div>
+        </div>
       </section>
 
-      <section id="screen-quiz" class="screen" aria-labelledby="quiz-title">
-        <div class="narrow-wrap quiz-wrap">
-          <div class="quiz-header">
-            <button class="back-button" data-target="material">← Thoát</button>
-            <span id="progress-label">CÂU 1 / 3</span>
+      <div id="resize-handle" class="hidden w-1 shrink-0 cursor-col-resize bg-slate-200 transition-colors hover:bg-blue-400 md:block" role="separator" aria-label="Điều chỉnh kích thước chatbot" aria-orientation="vertical" tabindex="0"></div>
+      <aside id="chat-panel" class="flex h-1/2 min-h-0 w-full flex-col border-t border-slate-200 bg-white transition-all duration-300 md:h-full md:w-[var(--chat-width)] md:border-l md:border-t-0">
+        <header class="flex shrink-0 items-center justify-between border-b border-slate-200 px-5 py-4 sm:px-6">
+          <div>
+            <h2 class="text-lg font-bold text-slate-900">AI Tutor Bot</h2>
+            <div class="mt-1 flex items-center gap-1.5 text-xs text-slate-500">
+              <span class="h-2 w-2 rounded-full bg-emerald-500 ring-2 ring-emerald-100"></span>
+              Online
+            </div>
           </div>
-          <div class="progress-track"><div id="progress-bar" class="progress-bar"></div></div>
-          <article class="card question-card">
-            <div class="question-meta"><span id="question-topic">ATTENTION</span><span id="question-number">01</span></div>
-            <h2 id="quiz-title">Đang tải câu hỏi…</h2>
-            <div id="options" class="options" role="radiogroup" aria-label="Các lựa chọn"></div>
-            <button id="submit-answer" class="primary-button full-width" disabled>Chọn một đáp án</button>
-          </article>
-        </div>
-      </section>
+          <div class="flex items-center gap-2">
+            <span class="hidden rounded-full bg-blue-50 px-3 py-1 text-xs font-medium text-blue-600 lg:inline">Ôn tập cùng AI</span>
+            <button id="toggle-chat" class="rounded-lg border border-slate-200 px-3 py-2 text-xs font-semibold text-slate-600 transition hover:border-blue-400 hover:bg-blue-50 hover:text-blue-700" type="button" aria-label="Mở rộng chatbot">Mở rộng</button>
+          </div>
+        </header>
 
-      <section id="screen-feedback" class="screen" aria-labelledby="feedback-title">
-        <div class="narrow-wrap">
-          <div class="step-pill">KẾT QUẢ CÂU HỎI</div>
-          <article id="feedback-card" class="card feedback-card">
-            <div id="feedback-icon" class="feedback-icon">✓</div>
-            <p id="feedback-status" class="feedback-status">Chính xác</p>
-            <h2 id="feedback-title">Đáp án đúng là…</h2>
-            <div id="feedback-answer" class="answer-callout"></div>
-            <div class="explanation-box">
-              <h3>Vì sao?</h3>
-              <p id="feedback-explanation"></p>
+        <div id="chat-history" class="min-h-0 flex-1 space-y-4 overflow-y-auto bg-slate-50 px-4 py-5 sm:px-6">
+          <div class="flex justify-start">
+            <div class="max-w-[88%] rounded-2xl rounded-tl-md bg-gray-200 px-4 py-3 text-sm leading-6 text-slate-700 shadow-sm">
+              Chào bạn, hãy upload tài liệu để tôi tạo bài trắc nghiệm ôn tập nhé.
             </div>
-            <div class="citation"><span>▣</span> <span id="feedback-citation"></span></div>
-            <button id="next-question" class="primary-button full-width">Câu tiếp theo <span>→</span></button>
-          </article>
-        </div>
-      </section>
+          </div>
 
-      <section id="screen-result" class="screen" aria-labelledby="result-title">
-        <div class="narrow-wrap">
-          <article class="card result-card">
-            <div class="result-icon">✦</div>
-            <p class="eyebrow">HOÀN THÀNH BÀI ÔN TẬP</p>
-            <h2 id="result-title">Bạn đã hoàn thành!</h2>
-            <div class="score-ring"><strong id="score-number">0</strong><span>/ 3 câu đúng</span></div>
-            <p id="result-message" class="result-message"></p>
-            <div class="result-actions">
-              <button id="retry-quiz" class="primary-button">Làm lại <span>↻</span></button>
-              <button class="secondary-button" data-target="material">Về bài học</button>
-            </div>
-          </article>
         </div>
-      </section>
+
+        <form id="chat-form" class="shrink-0 border-t border-slate-200 bg-white p-4 sm:px-6">
+          <div class="flex items-center gap-2 rounded-xl border border-slate-300 bg-white p-1.5 shadow-sm focus-within:border-blue-500 focus-within:ring-4 focus-within:ring-blue-50">
+            <input id="chat-input" class="min-w-0 flex-1 border-0 bg-transparent px-3 py-2 text-sm text-slate-800 outline-none placeholder:text-slate-400" type="text" placeholder="Nhập câu lệnh..." autocomplete="off" />
+            <button class="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-100" type="submit">Gửi</button>
+          </div>
+        </form>
+      </aside>
     </main>
-    <script src="app.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.min.mjs" type="module"></script>
+    <script src="app.js" type="module"></script>
   </body>
 </html>

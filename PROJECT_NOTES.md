@@ -38,18 +38,18 @@ Insight: VLearn đang trả lời câu hỏi của học viên nhưng chưa hỗ
 8. Làm hết 3 câu và xem tổng điểm.
 9. Chọn **Làm lại** hoặc **Tải tài liệu khác**.
 
-## 5. Trạng thái hiện tại — CP2
+## 5. Trạng thái hiện tại — CP3
 
 Đã hoàn thành prototype tại thư mục `codebase/`.
 
 - `codebase/index.html`: các màn hình của flow.
 - `codebase/styles.css`: giao diện prototype.
-- `codebase/app.js`: logic chuyển màn hình, chọn đáp án và tính điểm.
+- `codebase/app.js`: logic upload/hiển thị tài liệu, gọi backend, chọn đáp án và tính điểm.
 - `codebase/README.md`: hướng dẫn chạy.
 
-CP2 hiện dùng câu hỏi, đáp án, giải thích và citation giả được hardcode trong `app.js`. Mục tiêu CP2 là chứng minh flow bấm được từ đầu đến cuối; chưa cần AI thật.
+CP2 ban đầu dùng dữ liệu hardcode để chứng minh flow. Hiện prototype đã được nâng lên CP3: backend gọi Gemini thật, kiểm tra JSON/schema và frontend hiển thị quiz, giải thích, citation.
 
-Branch/commit CP2 đã được merge vào `main`.
+Branch/commit CP2 đã được merge vào `main`; các thay đổi CP3 đang được phát triển trên branch hiện tại.
 
 ## 6. Việc cần làm tiếp theo — CP3
 

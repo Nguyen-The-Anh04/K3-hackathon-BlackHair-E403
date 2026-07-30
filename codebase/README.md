@@ -1,4 +1,4 @@
-# VLearn Ôn tập nhanh — CP2 prototype
+# VLearn Ôn tập nhanh — CP3 prototype
 
 Prototype CP3 cho flow: tài liệu mẫu → gọi AI thật → làm 3 câu trắc nghiệm → xem đáp án/giải thích/citation → tổng kết → làm lại.
 
@@ -19,6 +19,6 @@ Backend mặc định dùng `gemini-3.1-flash-lite`. Không commit API key hoặ
 ## Phạm vi CP3
 
 - Câu hỏi được sinh bằng lời gọi Gemini thật ở `/api/generate-quiz`.
-- Backend kiểm tra schema: đúng 3 câu, mỗi câu 4 lựa chọn và đáp án A–D.
+- Backend kiểm tra schema: số câu theo yêu cầu (từ 1 đến 10), mỗi câu 4 lựa chọn và đáp án A–D.
 - Màn hình cấu hình có ô để Labcoach nhập yêu cầu lạ; AI có thể từ chối nếu yêu cầu nằm ngoài tài liệu.
-- Tài liệu hiện là text mẫu về AI/Attention; upload PDF sẽ làm ở bước tiếp theo.
+- Có thể upload PDF có lớp text, TXT, MD và một số định dạng ảnh để xem trước. OCR cho PDF/ảnh scan chưa được hỗ trợ.
