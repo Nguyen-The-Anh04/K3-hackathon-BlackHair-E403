@@ -2,6 +2,8 @@
 
 import json
 import os
+import re
+import unicodedata
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.error import HTTPError, URLError
@@ -27,6 +29,12 @@ def load_dotenv():
 
 load_dotenv()
 MODEL = os.getenv("GEMINI_MODEL", "gemini-3.1-flash-lite")
+GENERIC_TASK_WORDS = {
+    "hay", "hãy", "tao", "tạo", "cau", "câu", "hoi", "hỏi", "trac", "trắc",
+    "nghiem", "nghiệm", "on", "ôn", "tap", "tập", "tu", "từ", "tai", "tài",
+    "lieu", "liệu", "nay", "này", "cho", "toi", "tôi", "ve", "về", "mot", "một",
+    "ba", "3", "bo", "bộ", "slide", "slides", "quiz", "mcq", "trong", "theo",
+}
 
 
 def make_prompt(source_text: str, count: int, task: str) -> str:
@@ -40,6 +48,7 @@ QUY TẮC BẮT BUỘC:
 - citation phải trỏ tới trang/đoạn có trong tài liệu. Nếu tài liệu không có số trang, dùng [Tài liệu nguồn].
 - Nếu một ý không đủ căn cứ, không dùng ý đó để tạo câu hỏi.
 - Nếu yêu cầu nằm ngoài tài liệu hoặc không đủ căn cứ, trả về questions rỗng và trường refusal.
+- Không biến một yêu cầu ngoài tài liệu thành một quiz chung chung về chủ đề khác.
 
 Trả về DUY NHẤT JSON hợp lệ, không markdown, theo schema:
 {{"questions":[{{"question":"...","options":["...","...","...","..."],"correct_option":"A","explanation":"...","citation":"[Trang X]"}}]}}
@@ -50,6 +59,24 @@ YÊU CẦU CỦA NGƯỜI DÙNG:
 TÀI LIỆU NGUỒN:
 {source_text}
 """
+
+
+def normalize_for_scope(text: str) -> str:
+    text = unicodedata.normalize("NFD", text.lower())
+    return "".join(char for char in text if unicodedata.category(char) != "Mn")
+
+
+def find_out_of_scope_term(source_text: str, task: str):
+    source = normalize_for_scope(source_text)
+    task_tokens = re.findall(r"[a-z0-9]+", normalize_for_scope(task))
+    source_tokens = set(re.findall(r"[a-z0-9]+", source))
+    generic_tokens = {normalize_for_scope(word) for word in GENERIC_TASK_WORDS}
+    for token in task_tokens:
+        if len(token) < 4 or token in generic_tokens:
+            continue
+        if token not in source_tokens:
+            return token
+    return None
 
 
 def call_gemini(source_text: str, count: int, task: str):
@@ -93,7 +120,7 @@ def call_gemini(source_text: str, count: int, task: str):
             "explanation": str(item.get("explanation", "")).strip(),
             "citation": str(item.get("citation", "[Tài liệu nguồn]")).strip(),
         })
-    return normalized
+    return {"questions": normalized}
 
 
 class Handler(BaseHTTPRequestHandler):
@@ -129,6 +156,14 @@ class Handler(BaseHTTPRequestHandler):
                 raise ValueError("Yêu cầu kiểm thử đang trống.")
             if count != 3:
                 raise ValueError("Prototype CP3 hiện chỉ hỗ trợ 3 câu hỏi.")
+            out_of_scope_term = find_out_of_scope_term(source_text, task)
+            if out_of_scope_term:
+                self.send_json(200, {
+                    "questions": [],
+                    "refusal": f"Yêu cầu có chủ đề '{out_of_scope_term}' không xuất hiện trong tài liệu được cung cấp.",
+                    "model": MODEL,
+                })
+                return
             result = call_gemini(source_text, count, task)
             self.send_json(200, {**result, "model": MODEL})
         except (ValueError, RuntimeError, json.JSONDecodeError) as error:
