@@ -35,6 +35,7 @@ GENERIC_TASK_WORDS = {
     "lieu", "liệu", "nay", "này", "cho", "toi", "tôi", "ve", "về", "mot", "một",
     "ba", "3", "bo", "bộ", "slide", "slides", "quiz", "mcq", "trong", "theo",
 }
+QUIZ_REQUEST_TERMS = ("quiz", "cau hoi", "trac nghiem", "on tap", "kiem tra", "mcq")
 
 
 def make_prompt(source_text: str, count: int, task: str) -> str:
@@ -66,11 +67,18 @@ def normalize_for_scope(text: str) -> str:
     return "".join(char for char in text if unicodedata.category(char) != "Mn")
 
 
+def is_quiz_request(task: str) -> bool:
+    normalized = normalize_for_scope(task)
+    return any(term in normalized for term in QUIZ_REQUEST_TERMS)
+
+
 def find_out_of_scope_term(source_text: str, task: str):
     source = normalize_for_scope(source_text)
     task_tokens = re.findall(r"[a-z0-9]+", normalize_for_scope(task))
     source_tokens = set(re.findall(r"[a-z0-9]+", source))
     generic_tokens = {normalize_for_scope(word) for word in GENERIC_TASK_WORDS}
+    # These are instructions about the quiz output, not source topics.
+    generic_tokens.update({"giai", "thich"})
     for token in task_tokens:
         if len(token) < 4 or token in generic_tokens:
             continue
@@ -102,13 +110,25 @@ def call_gemini(source_text: str, count: int, task: str):
         parsed = json.loads(raw_text)
     except (KeyError, IndexError, TypeError, json.JSONDecodeError) as error:
         raise RuntimeError("AI trả về dữ liệu không đúng JSON mong đợi.") from error
-    questions = parsed.get("questions")
-    if questions == [] and parsed.get("refusal"):
-        return {"questions": [], "refusal": str(parsed["refusal"])}
+
+    # Some Gemini responses follow the prompt schema while others return the
+    # questions array directly. Normalize both forms before validating them.
+    if isinstance(parsed, list):
+        questions = parsed
+        refusal = None
+    elif isinstance(parsed, dict):
+        questions = parsed.get("questions")
+        refusal = parsed.get("refusal")
+    else:
+        raise RuntimeError("AI trả về JSON không phải object hoặc array.")
+    if questions == [] and refusal:
+        return {"questions": [], "refusal": str(refusal)}
     if not isinstance(questions, list) or len(questions) != count:
         raise RuntimeError(f"AI không trả về đúng {count} câu hỏi.")
     normalized = []
     for item in questions:
+        if not isinstance(item, dict):
+            raise RuntimeError("Một câu hỏi AI không có dạng object hợp lệ.")
         options = item.get("options")
         answer = str(item.get("correct_option", "")).strip().upper()
         if not isinstance(options, list) or len(options) != 4 or answer not in "ABCD":
@@ -154,8 +174,15 @@ class Handler(BaseHTTPRequestHandler):
                 raise ValueError("Nội dung tài liệu đang trống.")
             if not task:
                 raise ValueError("Yêu cầu kiểm thử đang trống.")
-            if count != 3:
-                raise ValueError("Prototype CP3 hiện chỉ hỗ trợ 3 câu hỏi.")
+            if count < 1 or count > 10:
+                raise ValueError("Số câu hỏi phải nằm trong khoảng từ 1 đến 10.")
+            if not is_quiz_request(task):
+                self.send_json(200, {
+                    "questions": [],
+                    "refusal": "Mình chỉ hỗ trợ tạo câu hỏi trắc nghiệm ôn tập dựa trên tài liệu được cung cấp.",
+                    "model": MODEL,
+                })
+                return
             out_of_scope_term = find_out_of_scope_term(source_text, task)
             if out_of_scope_term:
                 self.send_json(200, {
@@ -168,6 +195,8 @@ class Handler(BaseHTTPRequestHandler):
             self.send_json(200, {**result, "model": MODEL})
         except (ValueError, RuntimeError, json.JSONDecodeError) as error:
             self.send_json(400, {"error": str(error)})
+        except Exception as error:
+            self.send_json(500, {"error": f"Lỗi backend không mong đợi: {error}"})
 
     def do_GET(self):
         relative = "index.html" if self.path in ("/", "") else self.path.lstrip("/")

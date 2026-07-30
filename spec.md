@@ -1,9 +1,7 @@
-# AI SPEC — Quiz ôn tập từ slide · Nhóm Black Hair · Zone [X]
+# AI SPEC — Quiz ôn tập từ slide · Nhóm BlackHair · Zone [X]
 
 Hướng: [x] A — VLearn  [ ] B — Trợ lý Học viên  [ ] C — Làn mở  
 Loại: [ ] Tối ưu tính năng có sẵn  [x] Tính năng mới
-
-> Trạng thái tại CP4: prototype working ở mức local; AI thật đã tích hợp với `gemini-3.1-flash-lite`. Tài liệu đầu vào hiện là text demo về AI/Transformer; upload PDF/OCR chưa hoàn thành.
 
 ## §1. User & Job
 
@@ -35,8 +33,6 @@ Loại: [ ] Tối ưu tính năng có sẵn  [x] Tính năng mới
 
 - **Tutor VLearn hiện tại:** flow hỏi–đáp theo đoạn slide, có citation nhưng chưa chủ động kiểm tra hiểu bài; đáng học là đặt câu hỏi trong ngữ cảnh tài liệu, đáng né là citation không ổn định và gần như không có follow-up/check question.
 - **Quiz/flashcard pattern:** đáng học là câu hỏi ngắn, feedback ngay sau mỗi câu và tổng điểm; đáng né là câu hỏi không có nguồn hoặc đáp án mơ hồ. Prototype của nhóm khác ở chỗ mọi câu hỏi/giải thích phải bám bộ slide đầu vào.
-- **Trạng thái:** phần benchmark sản phẩm bên ngoài chưa hoàn tất; cần bổ sung tên sản phẩm, flow và nguồn tham khảo trước CP5 nếu sử dụng trong slide demo.
-
 ## §4. Thiết kế
 
 - **Lát cắt một câu:** Học viên tải bộ slide AI và nhập yêu cầu ôn tập; AI quyết định yêu cầu có đủ căn cứ trong slide để tạo quiz hay phải từ chối; hệ thống trả 3 câu hỏi trắc nghiệm kèm điểm, giải thích và citation theo trang.
@@ -111,8 +107,6 @@ Loại: [ ] Tối ưu tính năng có sẵn  [x] Tính năng mới
   - **Phạm Văn Lưu** — học viên khóa AI Thực Chiến, không trong nhóm.
   - **Phạm Thế Dũng** — học viên khóa AI Thực Chiến, không trong nhóm.
 - **Kế hoạch validation CP5:** cho từng người dùng thử một bộ slide AI và flow tạo 3 câu hỏi; ghi tối thiểu 5 feedback mẫu có tên. Ba câu hỏi validation: (1) bạn có hiểu cách tải slide và bắt đầu ôn tập không, (2) câu hỏi/đáp án/giải thích có bám đúng slide không, (3) citation có tạo niềm tin và bạn có muốn dùng lại không. **Nguyễn Thế Anh** phụ trách tổng hợp feedback log và changelog.
-- **Multi-prototype:** chưa làm multi-prototype; đang ưu tiên một flow working có AI thật và đo được.
-
 ## §9. Changelog
 
 | Thời điểm | Đổi gì | Vì sao |
