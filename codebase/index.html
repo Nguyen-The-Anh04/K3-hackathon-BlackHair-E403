@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>VLearn Ôn tập nhanh</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <header class="topbar">
+        <div class="brand-mark">V</div>
+        <div>
+          <p class="eyebrow">VLEARN · BÀI HỌC AI THỰC CHIẾN</p>
+          <h1>Ôn tập nhanh</h1>
+        </div>
+        <span class="mock-badge">Prototype · Mock data</span>
+      </header>
+
+      <section id="screen-material" class="screen active" aria-labelledby="material-title">
+        <div class="breadcrumb">Khoá học / Day 1 / Foundation</div>
+        <div class="hero-grid">
+          <article class="card lesson-card">
+            <div class="lesson-label"><span class="dot"></span> ĐOẠN ĐANG HỌC</div>
+            <h2 id="material-title">Attention trong Transformer</h2>
+            <p class="muted">Bài học 04 · khoảng 8 phút đọc</p>
+            <div class="source-text">
+              <p>Self-attention cho phép mô hình xác định mức độ liên quan giữa các token trong cùng một câu. Mỗi token tạo ra ba vector: Query, Key và Value.</p>
+              <p>Thông qua các vector này, mô hình quyết định nên tập trung vào những token nào khi tạo biểu diễn cho token hiện tại.</p>
+            </div>
+            <div class="citation"><span>▣</span> Nguồn: Transcript bài giảng · [T04-032] – [T04-034]</div>
+          </article>
+
+          <aside class="card action-card">
+            <div class="sparkle">✦</div>
+            <h2>Kiểm tra mức độ hiểu bài</h2>
+            <p>Trả lời 3 câu hỏi ngắn về đoạn vừa học, xem giải thích và nguồn tham khảo sau mỗi câu.</p>
+            <button id="start-quiz" class="primary-button">Tạo câu hỏi ôn tập <span>→</span></button>
+            <p class="tiny-note">Dữ liệu câu hỏi hiện đang được mock cho prototype CP2.</p>
+          </aside>
+        </div>
+      </section>
+
+      <section id="screen-setup" class="screen" aria-labelledby="setup-title">
+        <div class="narrow-wrap">
+          <button class="back-button" data-target="material">← Quay lại bài học</button>
+          <div class="card setup-card">
+            <div class="step-pill">BƯỚC 1 / 2</div>
+            <h2 id="setup-title">Sẵn sàng ôn tập?</h2>
+            <p class="muted">Bạn sẽ làm một bài kiểm tra nhanh dựa trên đoạn “Attention trong Transformer”.</p>
+            <div class="setup-summary">
+              <div><strong>3</strong><span>câu hỏi</span></div>
+              <div><strong>~2</strong><span>phút</span></div>
+              <div><strong>1</strong><span>đoạn tài liệu</span></div>
+            </div>
+            <button id="begin-quiz" class="primary-button full-width">Bắt đầu làm bài <span>→</span></button>
+          </div>
+        </div>
+      </section>
+
+      <section id="screen-quiz" class="screen" aria-labelledby="quiz-title">
+        <div class="narrow-wrap quiz-wrap">
+          <div class="quiz-header">
+            <button class="back-button" data-target="material">← Thoát</button>
+            <span id="progress-label">CÂU 1 / 3</span>
+          </div>
+          <div class="progress-track"><div id="progress-bar" class="progress-bar"></div></div>
+          <article class="card question-card">
+            <div class="question-meta"><span id="question-topic">ATTENTION</span><span id="question-number">01</span></div>
+            <h2 id="quiz-title">Đang tải câu hỏi…</h2>
+            <div id="options" class="options" role="radiogroup" aria-label="Các lựa chọn"></div>
+            <button id="submit-answer" class="primary-button full-width" disabled>Chọn một đáp án</button>
+          </article>
+        </div>
+      </section>
+
+      <section id="screen-feedback" class="screen" aria-labelledby="feedback-title">
+        <div class="narrow-wrap">
+          <div class="step-pill">KẾT QUẢ CÂU HỎI</div>
+          <article id="feedback-card" class="card feedback-card">
+            <div id="feedback-icon" class="feedback-icon">✓</div>
+            <p id="feedback-status" class="feedback-status">Chính xác</p>
+            <h2 id="feedback-title">Đáp án đúng là…</h2>
+            <div id="feedback-answer" class="answer-callout"></div>
+            <div class="explanation-box">
+              <h3>Vì sao?</h3>
+              <p id="feedback-explanation"></p>
+            </div>
+            <div class="citation"><span>▣</span> <span id="feedback-citation"></span></div>
+            <button id="next-question" class="primary-button full-width">Câu tiếp theo <span>→</span></button>
+          </article>
+        </div>
+      </section>
+
+      <section id="screen-result" class="screen" aria-labelledby="result-title">
+        <div class="narrow-wrap">
+          <article class="card result-card">
+            <div class="result-icon">✦</div>
+            <p class="eyebrow">HOÀN THÀNH BÀI ÔN TẬP</p>
+            <h2 id="result-title">Bạn đã hoàn thành!</h2>
+            <div class="score-ring"><strong id="score-number">0</strong><span>/ 3 câu đúng</span></div>
+            <p id="result-message" class="result-message"></p>
+            <div class="result-actions">
+              <button id="retry-quiz" class="primary-button">Làm lại <span>↻</span></button>
+              <button class="secondary-button" data-target="material">Về bài học</button>
+            </div>
+          </article>
+        </div>
+      </section>
+    </main>
+    <script src="app.js"></script>
+  </body>
+</html>
