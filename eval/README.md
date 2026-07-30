@@ -1,6 +1,6 @@
 # CP3 Golden Set
 
-`golden_set.csv` gồm 20 case dùng để đánh giá lượt chạy đầu của chức năng sinh quiz AI.
+`golden_set.csv` gồm 35 case dùng để đánh giá chức năng sinh quiz AI.
 
 ## Nguồn
 
@@ -17,7 +17,10 @@ Toàn bộ case được xây dựng từ bộ slide demo tự tạo trong [`dem
 | Ngoài phạm vi slide | 2 |
 | Có khả năng nhiều đáp án đúng | 1 |
 | Mơ hồ/khó đọc | 1 |
-| **Tổng** | **20** |
+| Yêu cầu không được phép | 2 |
+| Hậu quả cao nếu trả lời sai | 2 |
+| Quan sát thực tế từ chatlog | 10 |
+| **Tổng** | **35** |
 
 ## Cách sử dụng
 
