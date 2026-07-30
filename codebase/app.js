@@ -1,42 +1,17 @@
-const questions = [
-  {
-    text: "Self-attention giúp mô hình làm gì?",
-    options: [
-      "Xác định mức độ liên quan giữa các token",
-      "Xoá toàn bộ token không quan trọng",
-      "Chuyển văn bản thành hình ảnh",
-      "Đo tốc độ mạng của ứng dụng"
-    ],
-    correct: 0,
-    explanation: "Self-attention cho phép mô hình tập trung vào những token liên quan khi tạo biểu diễn cho token hiện tại.",
-    citation: "Nguồn: Transcript bài giảng [T04-032]"
-  },
-  {
-    text: "Ba vector nào được tạo cho mỗi token trong cơ chế attention?",
-    options: ["Query, Key và Value", "Input, Output và Loss", "Train, Test và Valid", "Prompt, Tool và Agent"],
-    correct: 0,
-    explanation: "Mỗi token được biểu diễn qua Query, Key và Value; các vector này giúp tính mức độ liên quan và tổng hợp thông tin.",
-    citation: "Nguồn: Transcript bài giảng [T04-033]"
-  },
-  {
-    text: "Mô hình dùng thông tin attention để quyết định điều gì?",
-    options: ["Nên tập trung vào token nào", "Nên đổi tên bài học", "Nên xoá citation", "Nên tắt toàn bộ context"],
-    correct: 0,
-    explanation: "Attention cung cấp tín hiệu để mô hình biết token nào có liên quan hơn trong ngữ cảnh hiện tại.",
-    citation: "Nguồn: Transcript bài giảng [T04-034]"
-  }
-];
+const sampleMaterial = `
+[Trang 1] Self-attention cho phép mô hình xác định mức độ liên quan giữa các token trong cùng một câu. Mỗi token tạo ra ba vector: Query, Key và Value.
+[Trang 1] Thông qua các vector này, mô hình quyết định nên tập trung vào những token nào khi tạo biểu diễn cho token hiện tại.
+[Trang 2] Attention giúp mô hình giữ lại thông tin quan trọng trong ngữ cảnh thay vì xử lý mọi token với mức độ quan trọng như nhau.
+`;
 
+let questions = [];
 let currentQuestion = 0;
 let selectedAnswer = null;
 let score = 0;
 
 const screens = {
-  material: document.querySelector('#screen-material'),
-  setup: document.querySelector('#screen-setup'),
-  quiz: document.querySelector('#screen-quiz'),
-  feedback: document.querySelector('#screen-feedback'),
-  result: document.querySelector('#screen-result')
+  material: document.querySelector('#screen-material'), setup: document.querySelector('#screen-setup'),
+  quiz: document.querySelector('#screen-quiz'), feedback: document.querySelector('#screen-feedback'), result: document.querySelector('#screen-result')
 };
 
 function showScreen(name) {
@@ -45,11 +20,45 @@ function showScreen(name) {
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-function resetQuiz() {
-  currentQuestion = 0;
-  selectedAnswer = null;
-  score = 0;
+function setAiStatus(message, isError = false) {
+  ['#ai-status', '#setup-ai-status'].forEach((selector) => {
+    const status = document.querySelector(selector);
+    status.textContent = message;
+    status.style.color = isError ? '#c74343' : '';
+  });
 }
+
+async function generateQuiz() {
+  const button = document.querySelector('#begin-quiz');
+  const task = document.querySelector('#labcoach-request').value.trim();
+  if (!task) { setAiStatus('Hãy nhập yêu cầu kiểm thử trước khi bắt đầu.', true); return; }
+  button.disabled = true;
+  button.textContent = 'AI đang tạo câu hỏi…';
+  setAiStatus('Đang gọi AI thật và kiểm tra nội dung trả về…');
+  try {
+    const response = await fetch('/api/generate-quiz', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ source_text: sampleMaterial, task, count: 3 })
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.error || 'Không thể tạo câu hỏi.');
+    if (data.refusal) {
+      setAiStatus(`AI từ chối yêu cầu: ${data.refusal}`, true);
+      return;
+    }
+    questions = data.questions;
+    resetQuiz(); renderQuestion();
+    setAiStatus(`Đã tạo ${questions.length} câu bằng ${data.model}.`);
+    showScreen('quiz');
+  } catch (error) {
+    setAiStatus(`Lỗi: ${error.message} Hãy chạy server và kiểm tra GEMINI_API_KEY.`, true);
+  } finally {
+    button.disabled = false;
+    button.innerHTML = 'Bắt đầu làm bài <span>→</span>';
+  }
+}
+
+function resetQuiz() { currentQuestion = 0; selectedAnswer = null; score = 0; }
 
 function renderQuestion() {
   const question = questions[currentQuestion];
@@ -61,9 +70,7 @@ function renderQuestion() {
   document.querySelector('#submit-answer').disabled = true;
   document.querySelector('#submit-answer').textContent = 'Chọn một đáp án';
   document.querySelector('#options').innerHTML = question.options.map((option, index) => `
-    <button class="option" data-index="${index}" role="radio" aria-checked="false">
-      <span class="option-letter">${String.fromCharCode(65 + index)}</span><span>${option}</span>
-    </button>
+    <button class="option" data-index="${index}" role="radio" aria-checked="false"><span class="option-letter">${String.fromCharCode(65 + index)}</span><span>${option}</span></button>
   `).join('');
   document.querySelectorAll('.option').forEach((option) => option.addEventListener('click', () => selectOption(option)));
 }
@@ -76,8 +83,7 @@ function selectOption(option) {
     item.setAttribute('aria-checked', String(isSelected));
   });
   const submit = document.querySelector('#submit-answer');
-  submit.disabled = false;
-  submit.textContent = 'Kiểm tra đáp án →';
+  submit.disabled = false; submit.textContent = 'Kiểm tra đáp án →';
 }
 
 function showFeedback() {
@@ -103,7 +109,7 @@ function showResult() {
 }
 
 document.querySelector('#start-quiz').addEventListener('click', () => showScreen('setup'));
-document.querySelector('#begin-quiz').addEventListener('click', () => { resetQuiz(); renderQuestion(); showScreen('quiz'); });
+document.querySelector('#begin-quiz').addEventListener('click', generateQuiz);
 document.querySelector('#submit-answer').addEventListener('click', showFeedback);
 document.querySelector('#next-question').addEventListener('click', () => {
   if (currentQuestion < questions.length - 1) { currentQuestion += 1; renderQuestion(); showScreen('quiz'); } else showResult();
