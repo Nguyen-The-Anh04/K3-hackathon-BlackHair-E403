@@ -1,0 +1,59 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "VLearnAnswerFeedback",
+  "type": "object",
+  "required": [
+    "question_id",
+    "is_correct",
+    "selected_option_id",
+    "correct_option_id",
+    "feedback",
+    "key_takeaway",
+    "citations",
+    "next_action"
+  ],
+  "properties": {
+    "question_id": {
+      "type": "string"
+    },
+    "is_correct": {
+      "type": "boolean"
+    },
+    "selected_option_id": {
+      "enum": [
+        "A",
+        "B",
+        "C",
+        "D"
+      ]
+    },
+    "correct_option_id": {
+      "enum": [
+        "A",
+        "B",
+        "C",
+        "D"
+      ]
+    },
+    "feedback": {
+      "type": "string"
+    },
+    "key_takeaway": {
+      "type": "string"
+    },
+    "citations": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    },
+    "next_action": {
+      "enum": [
+        "continue",
+        "review_source",
+        "report_question"
+      ]
+    }
+  },
+  "additionalProperties": false
+}
