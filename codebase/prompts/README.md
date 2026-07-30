@@ -1,72 +1,80 @@
-# VLearn AI Tutor — Prompt Pack tạo quiz ôn tập
+# Runtime prompt của VLearn Quiz Prototype
 
-**Phiên bản:** 1.0  
-**Lát cắt:** Học viên chọn một bài giảng/phạm vi học, VLearn tạo bộ câu hỏi trắc nghiệm một đáp án đúng, chấm điểm, giải thích và trích dẫn nguồn.
+Thư mục này chỉ chứa các tệp đang phù hợp với code hiện tại.
 
-## 1. Kết luận kiến trúc quan trọng
+## Tệp đang dùng
 
-Prompt không thể tự đọc toàn bộ bài giảng nếu backend chỉ truyền trang hiện tại hoặc đoạn đang bôi đen. Với yêu cầu “tạo 10 câu ôn tập toàn bộ Day 1”, tầng retrieval phải cấp đủ nội dung của toàn bộ tài liệu hoặc các đoạn đại diện cho mọi phần chính.
+| Tệp | Vai trò |
+|---|---|
+| `quiz_generation_prompt.md` | Prompt duy nhất được `server.py` nạp khi khởi động |
+| `quiz_response.schema.json` | Hợp đồng JSON khớp với dữ liệu backend/frontend hiện tại |
+| `README.md` | Hướng dẫn và phạm vi |
 
-**Tối thiểu backend cần truyền:**
-- `material_id`, `material_title`, `scope_type`, `page_range` hoặc `section_ids`;
-- outline/danh sách section của tài liệu;
-- các source chunk có `source_id`, `page`, `chunk_id`, `section_title`, `text`;
-- coverage report cho biết section nào đã có/thiếu dữ liệu.
-
-Nếu coverage không đủ, model phải thu hẹp phạm vi hoặc hỏi lại, không được bịa cho đủ số câu.
-
-## 2. Flow đề xuất
+## Luồng thực tế của prototype
 
 ```text
-User request
-  → Scope Resolver
-  → Context Builder/Retrieval
-  → Quiz Generator
-  → Code Validator (JSON, 4 lựa chọn, unique ID, citation tồn tại)
-  → Semantic Critic (grounding, 1 đáp án đúng, distractor hợp lý)
-  → Repair các câu fail, tối đa 2 vòng
-  → UI hiển thị public_quiz
-  → Backend chấm điểm bằng answer_key
-  → Hiển thị explanation + citation
-  → Session Summary tùy chọn
+app.js gửi source_text + task + count=3
+        ↓
+server.py kiểm tra input và out-of-scope cơ bản
+        ↓
+server.py nạp quiz_generation_prompt.md
+        ↓
+Gemini tạo questions hoặc refusal
+        ↓
+server.py kiểm tra: đúng số câu, 4 lựa chọn, đáp án A–D
+        ↓
+app.js hiển thị quiz, tự chấm điểm, hiện giải thích và citation
 ```
 
-## 3. Dùng bản nào trong hackathon?
+Frontend hiện sử dụng các trường:
 
-- **Nhanh nhất để đạt CP3:** `prompts/07_monolithic_hackathon_prompt.md` + JSON schema.
-- **Ổn định hơn:** pipeline modular từ `01` đến `06`.
-- **Không dùng LLM để tính điểm.** Điểm được tính bằng code: `correct_count / total_questions * 100`.
-- Correct answer/explanation nằm ở backend; frontend chỉ nhận `public_quiz` trước khi học viên trả lời.
+```json
+{
+  "question": "...",
+  "options": ["...", "...", "...", "..."],
+  "correct_option": "A",
+  "explanation": "...",
+  "citation": "[Trang 1]"
+}
+```
 
-## 4. Biến đầu vào chung
+Backend chuyển chúng thành:
 
-- `{{user_request}}`: yêu cầu nguyên văn của học viên.
-- `{{material_metadata}}`: metadata tài liệu.
-- `{{requested_count}}`: mặc định 10, giới hạn prototype 5–20.
-- `{{difficulty_mix}}`: mặc định 30% nhận biết, 40% thông hiểu, 20% vận dụng, 10% phân tích.
-- `{{source_context}}`: các đoạn nguồn đã retrieve, có metadata đầy đủ.
-- `{{coverage_report}}`: mức phủ theo section/page.
-- `{{language}}`: `vi`.
+```json
+{
+  "text": "...",
+  "options": ["...", "...", "...", "..."],
+  "correct": 0,
+  "explanation": "...",
+  "citation": "[Trang 1]"
+}
+```
 
-## 5. Ngưỡng đề xuất
+## Placeholder của prompt
 
-- Không sinh câu nếu citation không tồn tại trong source context.
-- Không ép đủ số lượng nếu nguồn không đủ; trả `insufficient_grounding` và `safe_question_count`.
-- Mọi câu phải có đúng 4 lựa chọn khác nhau và đúng 1 đáp án.
-- Mỗi câu phải được hỗ trợ trực tiếp bởi ít nhất 1 source chunk.
-- Với quiz 10 câu, nên phủ ít nhất 4 section chính nếu tài liệu có từ 4 section trở lên.
-- Quality bar gợi ý: ≥85% case đạt toàn bộ tiêu chí; điều kiện cứng: 0 câu bịa citation, 0 câu có hơn một đáp án đúng.
+Không đổi tên ba placeholder sau nếu chưa sửa `server.py`:
 
-## 6. File trong pack
+- `{{QUESTION_COUNT}}`
+- `{{USER_TASK}}`
+- `{{SOURCE_TEXT}}`
 
-- `prompts/00_system_prompt.md`: policy layer dùng chung.
-- `prompts/01_scope_resolver.md`: chuẩn hóa yêu cầu và quyết định hỏi lại.
-- `prompts/02_quiz_generator.md`: tạo quiz có grounding.
-- `prompts/03_quiz_critic.md`: kiểm tra semantic.
-- `prompts/04_quiz_repair.md`: sửa riêng câu fail.
-- `prompts/05_answer_feedback.md`: phản hồi sau từng câu.
-- `prompts/06_session_summary.md`: tổng kết cuối lượt.
-- `prompts/07_monolithic_hackathon_prompt.md`: bản một-call dễ tích hợp.
-- `schemas/`: JSON schema.
-- `integration/`: contract retrieval/tool và checklist.
-- `eval/`: rubric, golden-set template và version log.
+## Vì sao đã bỏ các tệp cũ?
+
+Bộ prompt ban đầu mô tả một kiến trúc lớn hơn prototype đã build, gồm scope resolver bằng LLM, critic, repair, answer-feedback prompt, session-summary prompt, tool contracts và schema public/private. Code hiện tại không gọi các thành phần đó.
+
+Các nội dung đã bỏ khỏi `codebase/prompts/`:
+
+- thư mục `prompts/prompts/` nhiều bước;
+- `eval/` lồng bên trong prompt;
+- `integration/`;
+- các schema không được frontend/backend dùng;
+- file consolidated trùng lặp.
+
+Golden set chính vẫn nằm ở thư mục gốc `eval/`, không đặt lẫn với runtime prompt.
+
+## Chỉnh prompt
+
+1. Sửa `quiz_generation_prompt.md`.
+2. Giữ nguyên các placeholder.
+3. Khởi động lại `python server.py` để nạp phiên bản mới.
+4. Chạy `python eval/run_current_prompt.py` để đánh giá cùng prompt đang dùng.
