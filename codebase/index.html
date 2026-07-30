@@ -14,7 +14,7 @@
           <p class="eyebrow">VLEARN · BÀI HỌC AI THỰC CHIẾN</p>
           <h1>Ôn tập nhanh</h1>
         </div>
-        <span class="mock-badge">Prototype · Mock data</span>
+        <span class="mock-badge">Prototype · AI thật</span>
       </header>
 
       <section id="screen-material" class="screen active" aria-labelledby="material-title">
@@ -36,7 +36,7 @@
             <h2>Kiểm tra mức độ hiểu bài</h2>
             <p>Trả lời 3 câu hỏi ngắn về đoạn vừa học, xem giải thích và nguồn tham khảo sau mỗi câu.</p>
             <button id="start-quiz" class="primary-button">Tạo câu hỏi ôn tập <span>→</span></button>
-            <p class="tiny-note">Dữ liệu câu hỏi hiện đang được mock cho prototype CP2.</p>
+            <p id="ai-status" class="tiny-note">AI sẽ tạo câu hỏi từ nội dung tài liệu mẫu khi bạn bắt đầu.</p>
           </aside>
         </div>
       </section>
@@ -53,6 +53,9 @@
               <div><strong>~2</strong><span>phút</span></div>
               <div><strong>1</strong><span>đoạn tài liệu</span></div>
             </div>
+            <label class="request-label" for="labcoach-request">Yêu cầu kiểm thử <span>(Labcoach có thể nhập câu lạ)</span></label>
+            <textarea id="labcoach-request" class="request-input" rows="3">Tạo 3 câu hỏi trắc nghiệm ôn tập từ tài liệu này.</textarea>
+            <p id="setup-ai-status" class="tiny-note"></p>
             <button id="begin-quiz" class="primary-button full-width">Bắt đầu làm bài <span>→</span></button>
           </div>
         </div>
