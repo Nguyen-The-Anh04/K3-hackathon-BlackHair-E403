@@ -1,4 +1,10 @@
-# Mini Hackathon AI — Batch 03
+# BLACKHAIR:
+Nguyễn Thế Anh(2A202601791) — viết và chốt spec.md, đảm bảo quality bar bằng số.
+Evidence: Trần Quốc Hùng(2A202601683) — mining chatlog, trích xuất quote, viết §1-§2.
+Prompt: Nguyễn Đức Sơn(2A202601485) — thiết kế prompt cho AI, test golden set, phân tích kết quả.
+Code: Trần Quốc Hùng — tích hợp AI vào server.py, frontend gọi API, xử lý lỗi.
+Demo: BlackHair — viết demo script, chuẩn bị slide, dry run.
+
 
 **SPEC → Prototype → Demo.** Đây không phải cuộc thi code — đây là cuộc thi **tư duy sản phẩm AI**.
 
