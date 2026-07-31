@@ -17,7 +17,7 @@
   </head>
   <body class="h-screen overflow-hidden bg-gray-100 text-slate-800 antialiased">
     <div id="toast" class="pointer-events-none fixed left-1/2 top-5 z-50 hidden -translate-x-1/2 rounded-xl bg-slate-900 px-4 py-3 text-sm font-medium text-white shadow-xl transition-opacity"></div>
-    <main id="app-shell" class="flex h-screen w-full flex-col md:flex-row" style="--chat-width: 40%">
+    <main id="app-shell" class="flex h-screen w-full flex-col md:flex-row" style="--chat-width: 32%">
       <section class="flex min-w-0 flex-1 flex-col bg-gray-100 p-4 transition-all duration-300 sm:p-6 md:h-full">
         <div class="flex items-center justify-between">
           <div>
@@ -46,8 +46,8 @@
           </aside>
 
           <div class="flex min-w-0 flex-1 items-center justify-center py-1 md:py-3">
-          <div class="aspect-[16/10] w-full max-w-4xl rounded-2xl bg-white p-3 shadow-xl ring-1 ring-slate-200 transition-all duration-300 sm:p-6 md:p-8">
-            <div id="slide-preview" class="relative flex h-full flex-col justify-between overflow-hidden rounded-xl border border-dashed border-blue-200 bg-blue-50/50 p-5 sm:p-8">
+          <div class="aspect-[16/10] w-full max-w-none rounded-2xl bg-white p-2 shadow-xl ring-1 ring-slate-200 transition-all duration-300 sm:p-4 md:p-5">
+            <div id="slide-preview" class="relative flex h-full flex-col justify-between overflow-hidden rounded-xl border border-dashed border-blue-200 bg-blue-50/50 p-3 sm:p-4">
               <div class="flex items-center justify-between text-xs font-semibold uppercase tracking-wider text-blue-500">
                 <span id="document-label">Slide preview</span>
                 <span>01 / 01</span>

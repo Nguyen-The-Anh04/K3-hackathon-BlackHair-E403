@@ -109,15 +109,16 @@ function renderFileList() {
 async function renderPdfPage(pageNumber) {
   if (!activeDocument?.pdf) return false;
   const safePageNumber = Math.min(Math.max(pageNumber, 1), activeDocument.pdf.numPages);
+  activeDocument.pageNumber = safePageNumber;
   const page = await activeDocument.pdf.getPage(safePageNumber);
   const baseViewport = page.getViewport({ scale: 1 });
-  const availableWidth = Math.max(slidePreview.clientWidth - 32, 320);
-  const availableHeight = Math.max(slidePreview.clientHeight - 72, 240);
+  const availableWidth = Math.max(slidePreview.clientWidth - 24, 320);
+  const availableHeight = Math.max(slidePreview.clientHeight - 24, 240);
   const scale = Math.min(availableWidth / baseViewport.width, availableHeight / baseViewport.height);
   const viewport = page.getViewport({ scale });
   const ratio = window.devicePixelRatio || 1;
   const frame = document.createElement('div');
-  frame.className = 'flex min-h-0 flex-1 flex-col items-center justify-center gap-3';
+  frame.className = 'flex h-full min-h-0 w-full items-center justify-center';
   const canvas = document.createElement('canvas');
   canvas.className = 'max-h-full max-w-full rounded-lg bg-white shadow-sm';
   canvas.width = Math.floor(viewport.width * ratio);
@@ -126,8 +127,8 @@ async function renderPdfPage(pageNumber) {
   canvas.style.height = `${viewport.height}px`;
   frame.appendChild(canvas);
   const controls = document.createElement('div');
-  controls.className = 'flex shrink-0 items-center gap-3 rounded-full bg-white/95 px-3 py-1.5 text-xs font-semibold text-slate-600 shadow-md ring-1 ring-slate-200';
-  controls.innerHTML = '<button class="pdf-prev rounded-full px-2 py-1 hover:bg-blue-50 hover:text-blue-600">←</button><span class="pdf-page-label"></span><button class="pdf-next rounded-full px-2 py-1 hover:bg-blue-50 hover:text-blue-600">→</button>';
+  controls.className = 'pointer-events-none absolute inset-y-0 left-0 right-0 flex items-center justify-between px-2 sm:px-4';
+  controls.innerHTML = '<button type="button" class="pdf-prev pointer-events-auto grid h-10 w-10 place-items-center rounded-full bg-white/95 text-xl font-semibold text-slate-600 shadow-md ring-1 ring-slate-200 transition hover:bg-blue-50 hover:text-blue-600 disabled:cursor-not-allowed disabled:opacity-30" aria-label="Slide trước">←</button><span class="pdf-page-label pointer-events-auto absolute bottom-3 left-1/2 -translate-x-1/2 rounded-full bg-white/95 px-3 py-1.5 text-xs font-semibold text-slate-600 shadow-md ring-1 ring-slate-200"></span><button type="button" class="pdf-next pointer-events-auto grid h-10 w-10 place-items-center rounded-full bg-white/95 text-xl font-semibold text-slate-600 shadow-md ring-1 ring-slate-200 transition hover:bg-blue-50 hover:text-blue-600 disabled:cursor-not-allowed disabled:opacity-30" aria-label="Slide tiếp theo">→</button>';
   controls.querySelector('.pdf-page-label').textContent = `Trang ${safePageNumber} / ${activeDocument.pdf.numPages}`;
   controls.querySelector('.pdf-prev').disabled = safePageNumber === 1;
   controls.querySelector('.pdf-next').disabled = safePageNumber === activeDocument.pdf.numPages;
@@ -332,7 +333,7 @@ chatForm.addEventListener('submit', async (event) => {
 
 toggleChat.addEventListener('click', () => {
   const expanded = appShell.style.getPropertyValue('--chat-width').trim() === '55%';
-  appShell.style.setProperty('--chat-width', expanded ? '40%' : '55%');
+  appShell.style.setProperty('--chat-width', expanded ? '32%' : '55%');
   toggleChat.textContent = expanded ? 'Mở rộng' : 'Thu nhỏ';
   toggleChat.setAttribute('aria-label', expanded ? 'Mở rộng chatbot' : 'Thu nhỏ chatbot');
 });
@@ -366,6 +367,16 @@ function stopResizing() {
 
 resizeHandle.addEventListener('pointerup', stopResizing);
 resizeHandle.addEventListener('pointercancel', stopResizing);
+
+document.addEventListener('keydown', (event) => {
+  if (!activeDocument?.pdf) return;
+  const target = event.target;
+  if (target instanceof HTMLInputElement || target instanceof HTMLTextAreaElement || target.isContentEditable) return;
+  if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return;
+  event.preventDefault();
+  const direction = event.key === 'ArrowLeft' ? -1 : 1;
+  renderPdfPage((activeDocument.pageNumber || 1) + direction).catch(() => {});
+});
 
 let filesCollapsed = false;
 toggleFiles.addEventListener('click', () => {
