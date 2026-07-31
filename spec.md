@@ -1,6 +1,6 @@
 # AI SPEC — VLearn Ôn tập nhanh · Nhóm K3 BlackHair
 Hướng: [x] A — VLearn  
-Loại: [ ] Tối ưu tính năng có sẵn  [x] Tính năng mới
+Loại: [ ] Tối ưu tính năng có sẵn  [x] Tính năng mới ôn tập nhanh với câu hỏi trắc nghiệm
 
 ---
 
@@ -237,3 +237,6 @@ Tổng hợp: `eval/summary_round_1.md`
 | 2026-07-30 09:30 | Thêm quality bar cụ thể: ≥80% và 100% case loại ① không bịa | Dựa trên kết quả đo lượt 1 (17/20 = 85%) và yêu cầu rubric CP4 |
 | 2026-07-30 09:30 | Bổ sung 4 lớp chỗ khó cụ thể cho sản phẩm (không chỉ liệt kê tên) | Feedback CP4: "Chép lại định nghĩa 4 lớp trong đề bài · chỉ liệt kê tên nguyên tắc mà không nói áp vào chỗ nào trong sản phẩm" |
 | 2026-07-30 09:39 | Cập nhật spec.md theo dạng câu hỏi theo yêu cầu BTC | Yêu cầu format mới: Bằng chứng loại nào · Con số mạnh nhất · Ý tưởng đã cân nhắc · 4 tình huống khó · Nguyên tắc thiết kế |
+| 2026-07-31 02:00 | Thêm nút thu phóng (+/-) vào slide viewer | Feedback Nghĩa (CP5): "thiếu tính năng thu phóng giao diện để cho user dễ nhìn text hơn" |
+| 2026-07-31 02:00 | Mở rộng giải thích khi trả lời sai | Feedback Lưu (CP5): "giải thích đúng nhưng chưa đủ chi tiết. Mình muốn hệ thống giải thích rõ hơn tại sao các đáp án khác không đúng" |
+| 2026-07-31 02:00 | Làm nổi bật nút "Làm lại" ở màn hình kết quả | Feedback Phong (CP5): "không thấy nút làm lại rõ ràng, phải bấm lại từ đầu" |
