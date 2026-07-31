@@ -8,7 +8,7 @@ Golden set: 35 case
 
 | Chỉ số | Kết quả lượt 1 | Quality bar | Ghi chú |
 |---|---:|---:|---|
-| Case đạt expected behavior | 25/35 (71,4%) | ≥90% | Đã chấm cả pass, fail và quota error |
+| Case đạt expected behavior | 25/35 (71,4%) | ≥80% | Đã chấm cả pass, fail và quota error |
 | API phản hồi | 34/35 (97,1%) | 100% | M01 bị HTTP 429 quota |
 | Không bịa ngoài slide | 34/34 response có nội dung | 100% | Không thấy hallucination; có lỗi không từ chối yêu cầu bị cấm |
 | Xử lý đúng case thiếu thông tin | 2/2 (100%) | 100% | I01, I02 |

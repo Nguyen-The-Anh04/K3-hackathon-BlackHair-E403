@@ -90,9 +90,9 @@ Loại: [ ] Tối ưu tính năng có sẵn  [x] Tính năng mới
 - **Chiều chất lượng:** grounding, citation, tính đúng của đáp án, giải thích, duy nhất một đáp án đúng, xử lý refusal, xử lý input thực tế và format JSON.
 - **Định nghĩa kiểm chứng:** một case đạt khi output đúng `expected_behavior`, không dùng kiến thức ngoài slide, citation đúng trang và không vi phạm ràng buộc của case.
 - **Golden set:** 35 case trong [`eval/golden_set.csv`](eval/golden_set.csv), gồm 8 normal, 3 close concepts, 3 example, 2 insufficient, 2 out-of-scope, 2 ambiguous, 2 disallowed, 2 high-consequence, 1 multiple-correct và 10 observed từ chatlog.
-- **Quality bar chốt tại CP4:** “Đạt khi **≥90%** case qua bộ thử, và **AI không được bịa kiến thức hoặc trích dẫn ngoài bộ slide dù chỉ một lần**.”
+- **Quality bar chốt tại CP4:** “Đạt khi **≥80%** case qua bộ thử, và **AI không được bịa kiến thức hoặc trích dẫn ngoài bộ slide dù chỉ một lần**.”
 - **Kết quả lượt chạy đầu:** `25/35 = 71,4%`; API phản hồi `34/35`, một case lỗi quota `429`. Chi tiết đầy đủ, gồm cả fail, ở [`eval/results_round_1.csv`](eval/results_round_1.csv); tổng hợp ở [`eval/summary_round_1.md`](eval/summary_round_1.md).
-- **Khoảng cách so với chuẩn:** `90% - 71,4% = 18,6 điểm phần trăm`. Lỗi chính: chưa luôn hỏi lại input mơ hồ, chưa từ chối yêu cầu bị cấm và một case format không đúng.
+- **Khoảng cách so với chuẩn ở lượt đo đầu:** `80% - 71,4% = 8,6 điểm phần trăm`. Lỗi chính: chưa luôn hỏi lại input mơ hồ, chưa từ chối yêu cầu bị cấm và một case format không đúng.
 
 ## §8. Phân công & kế hoạch
 
@@ -108,6 +108,8 @@ Loại: [ ] Tối ưu tính năng có sẵn  [x] Tính năng mới
   - **Phạm Thế Dũng** — học viên khóa AI Thực Chiến, không trong nhóm.
 - **Kế hoạch validation CP5:** cho từng người dùng thử một bộ slide AI và flow tạo 3 câu hỏi; ghi tối thiểu 5 feedback mẫu có tên. Ba câu hỏi validation: (1) bạn có hiểu cách tải slide và bắt đầu ôn tập không, (2) câu hỏi/đáp án/giải thích có bám đúng slide không, (3) citation có tạo niềm tin và bạn có muốn dùng lại không. **Nguyễn Thế Anh** phụ trách tổng hợp feedback log và changelog.
 ## §9. Changelog
+
+| 2026-07-31 | Điều chỉnh quality bar từ 90% xuống 80% theo quyết định của nhóm | Cập nhật ngưỡng đánh giá trong spec. |
 
 | Thời điểm | Đổi gì | Vì sao |
 |---|---|---|

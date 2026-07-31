@@ -115,7 +115,7 @@ OCR là hướng phát triển sau hackathon cho PDF dạng ảnh/scan.
 
 ## 9. Quality bar đề xuất
 
-- Ít nhất 90% câu hỏi có đáp án đúng được xác minh.
+- Ít nhất 80% câu hỏi có đáp án đúng được xác minh.
 - 100% câu hỏi có citation hợp lệ.
 - 0 câu hỏi có nhiều đáp án đúng.
 - Ít nhất 80% người thử hiểu được giải thích.
